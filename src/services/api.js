@@ -4,9 +4,10 @@ import axios from 'axios';
 const API_URL = 'http://localhost:8080/api/customers';
 
 const api = {
-    // 1. Get all customers for the table view
-    getAllCustomers: () => {
-        return axios.get(`${API_URL}/all`);
+    // 1. UPDATED: Get paginated customers for the table view
+    // Defaulting to page 0 and size 50 as we discussed
+    getAllCustomers: (page = 0, size = 50) => {
+        return axios.get(`${API_URL}/all?page=${page}&size=${size}`);
     },
 
     // 2. Get a single customer's full details

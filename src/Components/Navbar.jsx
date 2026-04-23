@@ -38,16 +38,7 @@ const Navbar = () => {
             {/* Soft pill-shaped container with subtle hover lift */}
             <div className="flex items-center space-x-3 bg-slate-50 py-1.5 px-4 rounded-full border border-slate-100 shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 cursor-default">
               
-              {/* Avatar Circle */}
-              <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-primary font-bold shadow-inner">
-                MN
-              </div>
-              
-              {/* Animated Name Display */}
-              <span className="text-sm font-medium text-slate-700 name-glow tracking-wide">
-                Maheesha Nethmina
-              </span>
-              
+             
             </div>
           </div>
 

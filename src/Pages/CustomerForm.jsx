@@ -1,4 +1,4 @@
-import  { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
@@ -27,9 +27,15 @@ const CustomerForm = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        // Always fetch all customers so we can populate the Family Members dropdown
-        const allCustResponse = await api.getAllCustomers();
-        setAllCustomers(allCustResponse.data);
+        // Fetch customers for the Family Members dropdown (Fetching a large size so they all appear)
+        const allCustResponse = await api.getAllCustomers(0, 1000);
+        
+        // CRASH-PROOF CHECK: Safely extract the array whether the backend sends a Page object or a flat list
+        const validCustomerArray = allCustResponse.data.content 
+                                    ? allCustResponse.data.content 
+                                    : (Array.isArray(allCustResponse.data) ? allCustResponse.data : []);
+        
+        setAllCustomers(validCustomerArray);
 
         // If editing, fetch this specific customer's data
         if (isEditMode) {

@@ -7,38 +7,75 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
+  // Pagination States
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalRecords, setTotalRecords] = useState(0);
+
   // States for the Excel Upload Modal
   const [showModal, setShowModal] = useState(false);
   const [uploadFile, setUploadFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [uploadMessage, setUploadMessage] = useState('');
 
-  // Fetch all customers when the component mounts
-  const fetchCustomers = async () => {
+  // Fetch customers with CRASH-PROOF data checking
+  const fetchCustomers = async (pageNumber = 0) => {
     try {
       setLoading(true);
-      const response = await api.getAllCustomers();
-      setCustomers(response.data);
+      const response = await api.getAllCustomers(pageNumber, 50);
+      
+      // Let's log it so you can see exactly what the backend sent in your F12 console
+      console.log("Data from backend:", response.data);
+
+      let validCustomerArray = [];
+
+      // Safely check if it's the new Paginated format
+      if (response.data && Array.isArray(response.data.content)) {
+        validCustomerArray = response.data.content;
+      } 
+      // Safely check if it's the old flat array format
+      else if (Array.isArray(response.data)) {
+        validCustomerArray = response.data;
+      } 
+      // If it's neither, we log an error but DON'T crash the app
+      else {
+        console.error("Backend sent an unexpected data format:", response.data);
+      }
+      
+      setCustomers(validCustomerArray); 
+      
+      setCurrentPage(response.data?.number || 0);
+      setTotalPages(response.data?.totalPages || 1);
+      setTotalRecords(response.data?.totalElements || validCustomerArray.length);
+      
       setError(null);
     } catch (err) {
       setError('Failed to fetch customers. Ensure your backend is running.');
       console.error(err);
+      setCustomers([]); // Ensure it resets to a safe array on error
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchCustomers();
+    fetchCustomers(0);
   }, []);
 
-  // Handle file selection
+  // Pagination Handlers
+  const handlePreviousPage = () => {
+    if (currentPage > 0) fetchCustomers(currentPage - 1);
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages - 1) fetchCustomers(currentPage + 1);
+  };
+
   const handleFileChange = (e) => {
     setUploadFile(e.target.files[0]);
     setUploadMessage('');
   };
 
-  // Handle the bulk upload submission
   const handleBulkUpload = async (e) => {
     e.preventDefault();
     if (!uploadFile) {
@@ -52,10 +89,9 @@ const Dashboard = () => {
       await api.uploadBulkExcel(uploadFile);
       setUploadMessage('Upload successful! Refreshing data...');
       setUploadFile(null);
-      // Close modal and refresh table after a short delay
       setTimeout(() => {
         setShowModal(false);
-        fetchCustomers();
+        fetchCustomers(0);
         setUploadMessage('');
       }, 1500);
     } catch (err) {
@@ -72,7 +108,9 @@ const Dashboard = () => {
       <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-800">Customer Directory</h1>
-          <p className="text-sm text-slate-500 mt-1">Manage and view all registered customers.</p>
+          <p className="text-sm text-slate-500 mt-1">
+            Manage and view all registered customers. Total Records: <span className="font-semibold text-primary">{totalRecords.toLocaleString()}</span>
+          </p>
         </div>
         <div className="flex space-x-3">
           <button 
@@ -116,7 +154,8 @@ const Dashboard = () => {
                     Loading customers...
                   </td>
                 </tr>
-              ) : customers.length === 0 ? (
+              ) : !Array.isArray(customers) || customers.length === 0 ? (
+                // CRASH-PROOF RENDER CHECK: Ensures map is ONLY called if it's a real array
                 <tr>
                   <td colSpan="4" className="px-6 py-8 text-center text-slate-500">
                     No customers found. Add a customer or perform a bulk upload.
@@ -130,7 +169,6 @@ const Dashboard = () => {
                     <td className="px-6 py-4 text-slate-600">{customer.dob}</td>
                     <td className="px-6 py-4 text-center">
                       <div className="flex justify-center space-x-3">
-                        {/* We will build the View and Edit pages next */}
                         <Link to={`/view-customer/${customer.id}`} className="text-primary hover:text-primaryHover font-medium">
                           View
                         </Link>
@@ -145,6 +183,31 @@ const Dashboard = () => {
             </tbody>
           </table>
         </div>
+        
+        {/* Pagination Footer */}
+        {!loading && totalRecords > 0 && (
+          <div className="bg-slate-50 px-6 py-4 border-t border-slate-200 flex items-center justify-between">
+            <p className="text-sm text-slate-600">
+              Showing Page <span className="font-semibold">{currentPage + 1}</span> of <span className="font-semibold">{totalPages}</span>
+            </p>
+            <div className="flex space-x-2">
+              <button 
+                onClick={handlePreviousPage} 
+                disabled={currentPage === 0}
+                className="px-3 py-1 border border-slate-300 rounded-md text-sm font-medium bg-white text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                Previous
+              </button>
+              <button 
+                onClick={handleNextPage} 
+                disabled={currentPage >= totalPages - 1}
+                className="px-3 py-1 border border-slate-300 rounded-md text-sm font-medium bg-white text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Bulk Upload Modal */}
