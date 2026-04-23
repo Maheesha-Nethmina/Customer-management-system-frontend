@@ -68,7 +68,7 @@ const CustomerView = () => {
 
       <div className="space-y-6">
         
-        {/* Section 1: Basic Information */}
+        {/*  Basic Information */}
         <div className="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
           <h2 className="text-lg font-semibold text-slate-700 mb-4">Basic Information</h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
@@ -87,7 +87,7 @@ const CustomerView = () => {
           </div>
         </div>
 
-        {/* Section 2: Contact Details (Mobile) */}
+        {/* Contact Details  */}
         <div className="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
           <h2 className="text-lg font-semibold text-slate-700 mb-4">Mobile Numbers</h2>
           {customer.mobileNumbers && customer.mobileNumbers.length > 0 ? (
@@ -103,7 +103,7 @@ const CustomerView = () => {
           )}
         </div>
 
-        {/* Section 3: Addresses */}
+        {/* Addresses */}
         <div className="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
           <h2 className="text-lg font-semibold text-slate-700 mb-4">Addresses</h2>
           {customer.addresses && customer.addresses.length > 0 ? (
@@ -122,7 +122,7 @@ const CustomerView = () => {
           )}
         </div>
 
-        {/* Section 4: Family Members */}
+        {/*  Family Members */}
         <div className="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
           <h2 className="text-lg font-semibold text-slate-700 mb-4">Family Members</h2>
           {customer.familyMembers && customer.familyMembers.length > 0 ? (

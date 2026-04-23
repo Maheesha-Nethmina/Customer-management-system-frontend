@@ -24,7 +24,6 @@ const Dashboard = () => {
       setLoading(true);
       const response = await api.getAllCustomers(pageNumber, 50);
       
-      // Let's log it so you can see exactly what the backend sent in your F12 console
       console.log("Data from backend:", response.data);
 
       let validCustomerArray = [];
@@ -155,7 +154,6 @@ const Dashboard = () => {
                   </td>
                 </tr>
               ) : !Array.isArray(customers) || customers.length === 0 ? (
-                // CRASH-PROOF RENDER CHECK: Ensures map is ONLY called if it's a real array
                 <tr>
                   <td colSpan="4" className="px-6 py-8 text-center text-slate-500">
                     No customers found. Add a customer or perform a bulk upload.

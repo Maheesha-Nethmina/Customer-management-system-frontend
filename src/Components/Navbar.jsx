@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 const Navbar = () => {
   const location = useLocation();
 
-  // Helper function to highlight the active tab
+  
   const isActive = (path) => {
     return location.pathname === path 
       ? 'text-primary font-semibold border-b-2 border-primary' 
@@ -15,7 +15,7 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           
-          {/* Left Side: Logo & Navigation Links */}
+          {/* Logo & Navigation Links */}
           <div className="flex items-center space-x-8">
             <div className="flex-shrink-0 flex items-center">
               <Link to="/" className="text-2xl font-bold text-slate-800 tracking-tight">
@@ -33,14 +33,7 @@ const Navbar = () => {
             </div>
           </div>
 
-          {/* Right Side: User Profile Area */}
-          <div className="flex items-center">
-            {/* Soft pill-shaped container with subtle hover lift */}
-            <div className="flex items-center space-x-3 bg-slate-50 py-1.5 px-4 rounded-full border border-slate-100 shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 cursor-default">
-              
-             
-            </div>
-          </div>
+          
 
         </div>
       </div>
