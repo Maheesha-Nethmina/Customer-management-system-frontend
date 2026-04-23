@@ -3,11 +3,11 @@ import { useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
 const CustomerForm = () => {
-  const { id } = useParams(); // If there's an ID in the URL, we are in Edit Mode
+  const { id } = useParams(); 
   const navigate = useNavigate();
   const isEditMode = Boolean(id);
 
-  // Form State matching your backend CustomerDTO
+  
   const [formData, setFormData] = useState({
     name: '',
     dob: '',
@@ -21,16 +21,15 @@ const CustomerForm = () => {
   const [loading, setLoading] = useState(isEditMode);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
-  const [allCustomers, setAllCustomers] = useState([]); // For family member dropdown
+  const [allCustomers, setAllCustomers] = useState([]); //  family member dropdown
 
   // Fetch data on component mount
   useEffect(() => {
     const loadData = async () => {
       try {
-        // Fetch customers for the Family Members dropdown (Fetching a large size so they all appear)
+        // Fetch customers for the Family Members
         const allCustResponse = await api.getAllCustomers(0, 1000);
         
-        // CRASH-PROOF CHECK: Safely extract the array whether the backend sends a Page object or a flat list
         const validCustomerArray = allCustResponse.data.content 
                                     ? allCustResponse.data.content 
                                     : (Array.isArray(allCustResponse.data) ? allCustResponse.data : []);
@@ -67,7 +66,7 @@ const CustomerForm = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  // --- Dynamic Form Handlers (Mobile Numbers) ---
+  // Form Handlers for Mobile Numbers
   const addMobile = () => setFormData(prev => ({ ...prev, mobileNumbers: [...prev.mobileNumbers, { number: '' }] }));
   const removeMobile = (index) => setFormData(prev => ({ ...prev, mobileNumbers: prev.mobileNumbers.filter((_, i) => i !== index) }));
   const updateMobile = (index, value) => {
@@ -76,7 +75,7 @@ const CustomerForm = () => {
     setFormData(prev => ({ ...prev, mobileNumbers: updated }));
   };
 
-  // --- Dynamic Form Handlers (Addresses) ---
+  // Form Handlers for Addresses
   const addAddress = () => setFormData(prev => ({ ...prev, addresses: [...prev.addresses, { addressLine1: '', addressLine2: '', city: '', country: '' }] }));
   const removeAddress = (index) => setFormData(prev => ({ ...prev, addresses: prev.addresses.filter((_, i) => i !== index) }));
   const updateAddress = (index, field, value) => {
@@ -85,7 +84,7 @@ const CustomerForm = () => {
     setFormData(prev => ({ ...prev, addresses: updated }));
   };
 
-  // --- Handle Family Member Selection ---
+  //Handle Family Member Selection
   const handleFamilyChange = (e) => {
     // Convert selected options from HTMLCollection to an array of integers
     const selectedIds = Array.from(e.target.selectedOptions, option => parseInt(option.value));
@@ -104,7 +103,7 @@ const CustomerForm = () => {
       } else {
         await api.createCustomer(formData);
       }
-      // Go back to the dashboard on success
+      // Go back to the dashboard
       navigate('/');
     } catch (err) {
       setError(err.response?.data || 'Failed to save customer. Please check your inputs.');
@@ -135,7 +134,7 @@ const CustomerForm = () => {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         
-        {/* Section 1: Mandatory Fields */}
+        {/*  Mandatory Fields */}
         <div className="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
           <h2 className="text-lg font-semibold text-slate-700 mb-4 border-b border-slate-100 pb-2">Mandatory Information</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -157,7 +156,7 @@ const CustomerForm = () => {
           </div>
         </div>
 
-        {/* Section 2: Mobile Numbers (Optional/Multiple) */}
+        {/* Mobile Numbers  */}
         <div className="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
           <div className="flex justify-between items-center mb-4 border-b border-slate-100 pb-2">
             <h2 className="text-lg font-semibold text-slate-700">Mobile Numbers (Optional)</h2>
@@ -173,7 +172,7 @@ const CustomerForm = () => {
           {formData.mobileNumbers.length === 0 && <p className="text-sm text-slate-400">No mobile numbers added.</p>}
         </div>
 
-        {/* Section 3: Addresses (Optional/Multiple) */}
+        {/* Addresses  */}
         <div className="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
           <div className="flex justify-between items-center mb-4 border-b border-slate-100 pb-2">
             <h2 className="text-lg font-semibold text-slate-700">Addresses (Optional)</h2>
@@ -197,7 +196,7 @@ const CustomerForm = () => {
           {formData.addresses.length === 0 && <p className="text-sm text-slate-400">No addresses added.</p>}
         </div>
 
-        {/* Section 4: Family Members */}
+        {/* Family Members */}
         <div className="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
           <h2 className="text-lg font-semibold text-slate-700 mb-4 border-b border-slate-100 pb-2">Family Members (Optional)</h2>
           <label className="block text-sm text-slate-500 mb-2">Hold Ctrl (or Cmd on Mac) to select multiple existing customers.</label>
